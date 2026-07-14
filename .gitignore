@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Env / secrets
+.env
+*.db
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.env
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# Model cache
+.cache/
+*.pt
+*.bin
+
+# Jupyter
+.ipynb_checkpoints/
