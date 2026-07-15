@@ -1,11 +1,10 @@
 """
 MarketSynapse — FastAPI application entry point.
-Day 1 scope: app setup + /news route only.
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.routers import news
+from backend.routers import news, stock
 
 app = FastAPI(
     title="MarketSynapse API",
@@ -23,6 +22,7 @@ app.add_middleware(
 )
 
 app.include_router(news.router)
+app.include_router(stock.router)
 
 
 @app.get("/")
