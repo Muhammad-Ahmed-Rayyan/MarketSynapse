@@ -30,14 +30,20 @@ class StockServiceError(Exception):
 
 def fetch_price_summary(ticker: str, days_back: int = 7) -> PriceSummary:
     ticker = ticker.upper().strip()
+    end = datetime.now()
+    start = end - timedelta(days=days_back + 1)
+
     try:
         stock = yf.Ticker(ticker)
-        hist = stock.history(period=f"{days_back + 1}d")
+        hist = stock.history(start=start.strftime("%Y-%m-%d"), end=end.strftime("%Y-%m-%d"))
     except Exception as exc:
         raise StockServiceError(f"Failed to fetch price data for {ticker}: {exc}") from exc
 
     if hist.empty:
-        raise StockServiceError(f"No price data found for ticker '{ticker}'")
+        raise StockServiceError(
+            f"No price data found for ticker '{ticker}' — this can be a transient "
+            f"Yahoo Finance issue, try again in a moment"
+        )
 
     history = [
         PricePoint(date=idx.strftime("%Y-%m-%d"), close=round(float(row["Close"]), 2))

@@ -39,6 +39,16 @@ def _build_query(ticker: str) -> str:
     alias = TICKER_ALIASES.get(ticker)
     return f'"{ticker}" OR "{alias}"' if alias else f'"{ticker}"'
 
+def _is_relevant(article: Article, ticker: str) -> bool:
+    """
+    Sanity-check filter: NewsAPI's query matching is looser than expected,
+    so we double-check the ticker or company name actually appears in the
+    text before trusting an article as relevant.
+    """
+    ticker = ticker.upper()
+    alias = TICKER_ALIASES.get(ticker, "")
+    haystack = f"{article.title} {article.description or ''}".lower()
+    return ticker.lower() in haystack or (alias and alias.lower() in haystack)
 
 def fetch_articles(
     ticker: str,
@@ -77,8 +87,8 @@ def fetch_articles(
     if data.get("status") != "ok":
         raise NewsServiceError(f"NewsAPI error: {data.get('message', 'unknown error')}")
 
-    return [_to_article(raw) for raw in data.get("articles", [])]
-
+    articles = [_to_article(raw) for raw in data.get("articles", [])]
+    return [a for a in articles if _is_relevant(a, ticker)]
 
 def _to_article(raw: dict) -> Article:
     published_at = None
