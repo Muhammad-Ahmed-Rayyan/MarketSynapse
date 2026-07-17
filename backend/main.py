@@ -4,7 +4,7 @@ MarketSynapse — FastAPI application entry point.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.routers import news, stock, correlation
+from backend.routers import news, stock, correlation, brief
 
 app = FastAPI(
     title="MarketSynapse API",
@@ -24,7 +24,7 @@ app.add_middleware(
 app.include_router(news.router)
 app.include_router(stock.router)
 app.include_router(correlation.router)
-
+app.include_router(brief.router)
 
 @app.get("/")
 def root():
