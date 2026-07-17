@@ -8,7 +8,7 @@ is where the real reasoning happens — this just gives it clean
 pre-aggregated numbers to work with instead of raw article lists.
 """
 from pydantic import BaseModel
-
+from backend.services import cache_service
 from backend.models.schemas import Article
 from backend.services.news_service import fetch_articles
 from backend.services.sentiment_service import analyze_articles
@@ -60,8 +60,12 @@ def _determine_alignment(sentiment_label: str, price_change_pct: float) -> str:
         return "mixed"
     return "diverged"  # e.g. positive sentiment but price fell
 
-
 def get_correlation_summary(ticker: str, days_back: int = 7) -> CorrelationSummary:
+    cache_key = f"correlation:{ticker.upper()}:{days_back}"
+    cached = cache_service.get(cache_key)
+    if cached is not None:
+        return cached
+
     articles = fetch_articles(ticker, days_back=days_back)
     articles = analyze_articles(articles)
     price = fetch_price_summary(ticker, days_back=days_back)
@@ -69,7 +73,7 @@ def get_correlation_summary(ticker: str, days_back: int = 7) -> CorrelationSumma
     avg_score, sentiment_label = _overall_sentiment(articles)
     alignment = _determine_alignment(sentiment_label, price.change_pct or 0.0)
 
-    return CorrelationSummary(
+    summary = CorrelationSummary(
         ticker=ticker.upper(),
         period_days=days_back,
         avg_sentiment_score=avg_score,
@@ -80,6 +84,8 @@ def get_correlation_summary(ticker: str, days_back: int = 7) -> CorrelationSumma
         articles=articles,
         price=price,
     )
+    cache_service.set(cache_key, summary)
+    return summary
 
 
 if __name__ == "__main__":
