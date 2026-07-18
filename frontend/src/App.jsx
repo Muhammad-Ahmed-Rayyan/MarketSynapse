@@ -5,6 +5,9 @@ import PriceSummaryCard from "./components/PriceSummaryCard";
 import AlignmentBadge from "./components/AlignmentBadge";
 import BriefCard from "./components/BriefCard";
 import ArticleList from "./components/ArticleList";
+import PriceChart from "./components/PriceChart";
+import EmptyState from "./components/EmptyState";
+import LoadingState from "./components/LoadingState";
 
 function App() {
   const [ticker, setTicker] = useState("AAPL");
@@ -62,7 +65,11 @@ function App() {
           </div>
         )}
 
-        {report && (
+        {loading && <LoadingState />}
+
+        {!loading && !report && !error && <EmptyState />}
+
+        {!loading && report && (
           <div className="space-y-4">
             <div className="flex items-center gap-3 flex-wrap">
               <SentimentBadge
@@ -73,6 +80,7 @@ function App() {
             </div>
 
             <PriceSummaryCard price={report.analysis.price} />
+            <PriceChart history={report.analysis.price.history} />
             <BriefCard brief={report.brief} />
             <ArticleList articles={report.analysis.articles} />
           </div>
