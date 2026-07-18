@@ -1,5 +1,10 @@
 import { useState } from "react";
 import { fetchReport } from "./services/api";
+import SentimentBadge from "./components/SentimentBadge";
+import PriceSummaryCard from "./components/PriceSummaryCard";
+import AlignmentBadge from "./components/AlignmentBadge";
+import BriefCard from "./components/BriefCard";
+import ArticleList from "./components/ArticleList";
 
 function App() {
   const [ticker, setTicker] = useState("AAPL");
@@ -8,11 +13,12 @@ function App() {
   const [error, setError] = useState(null);
 
   const handleSearch = async () => {
+    if (!ticker.trim()) return;
     setLoading(true);
     setError(null);
     setReport(null);
     try {
-      const data = await fetchReport(ticker);
+      const data = await fetchReport(ticker.trim());
       setReport(data);
     } catch (err) {
       setError(err.message);
@@ -21,33 +27,57 @@ function App() {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleSearch();
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
-      <h1 className="text-2xl font-bold mb-4">MarketSynapse</h1>
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-2xl font-bold mb-1">MarketSynapse</h1>
+        <p className="text-gray-500 mb-6 text-sm">
+          News sentiment × price movement × AI-generated market brief
+        </p>
 
-      <div className="flex gap-2 mb-6">
-        <input
-          value={ticker}
-          onChange={(e) => setTicker(e.target.value.toUpperCase())}
-          className="border rounded px-3 py-2"
-          placeholder="AAPL"
-        />
-        <button
-          onClick={handleSearch}
-          disabled={loading}
-          className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
-        >
-          {loading ? "Loading..." : "Analyze"}
-        </button>
+        <div className="flex gap-2 mb-8">
+          <input
+            value={ticker}
+            onChange={(e) => setTicker(e.target.value.toUpperCase())}
+            onKeyDown={handleKeyDown}
+            className="border rounded px-3 py-2 flex-1"
+            placeholder="AAPL"
+          />
+          <button
+            onClick={handleSearch}
+            disabled={loading}
+            className="bg-blue-600 text-white px-5 py-2 rounded font-medium disabled:opacity-50 hover:bg-blue-700 transition"
+          >
+            {loading ? "Analyzing..." : "Analyze"}
+          </button>
+        </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded p-4 mb-6">
+            {error}
+          </div>
+        )}
+
+        {report && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              <SentimentBadge
+                label={report.analysis.sentiment_label}
+                score={report.analysis.avg_sentiment_score}
+              />
+              <AlignmentBadge alignment={report.analysis.alignment} />
+            </div>
+
+            <PriceSummaryCard price={report.analysis.price} />
+            <BriefCard brief={report.brief} />
+            <ArticleList articles={report.analysis.articles} />
+          </div>
+        )}
       </div>
-
-      {error && <p className="text-red-600">{error}</p>}
-
-      {report && (
-        <pre className="bg-white p-4 rounded border overflow-auto text-sm">
-          {JSON.stringify(report, null, 2)}
-        </pre>
-      )}
     </div>
   );
 }
