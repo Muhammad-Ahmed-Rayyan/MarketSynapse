@@ -8,21 +8,36 @@ import ArticleList from "./components/ArticleList";
 import PriceChart from "./components/PriceChart";
 import EmptyState from "./components/EmptyState";
 import LoadingState from "./components/LoadingState";
+import RecentSearches from "./components/RecentSearches";
+
+const isValidTicker = (t) => /^[A-Z]{1,5}$/.test(t);
+const MAX_RECENT = 5;
 
 function App() {
   const [ticker, setTicker] = useState("AAPL");
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [recent, setRecent] = useState([]);
 
-  const handleSearch = async () => {
-    if (!ticker.trim()) return;
+  const addRecentSearch = (t) => {
+    setRecent((prev) => [t, ...prev.filter((x) => x !== t)].slice(0, MAX_RECENT));
+  };
+
+  const runSearch = async (rawTicker) => {
+    const trimmed = rawTicker.trim().toUpperCase();
+    if (!isValidTicker(trimmed)) {
+      setError("Enter a valid ticker symbol (1-5 letters, e.g. AAPL)");
+      return;
+    }
+    setTicker(trimmed);
     setLoading(true);
     setError(null);
     setReport(null);
     try {
-      const data = await fetchReport(ticker.trim());
+      const data = await fetchReport(trimmed);
       setReport(data);
+      addRecentSearch(trimmed);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -30,6 +45,7 @@ function App() {
     }
   };
 
+  const handleSearch = () => runSearch(ticker);
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleSearch();
   };
@@ -42,13 +58,14 @@ function App() {
           News sentiment × price movement × AI-generated market brief
         </p>
 
-        <div className="flex gap-2 mb-8">
+        <div className="flex gap-2 mb-3">
           <input
             value={ticker}
             onChange={(e) => setTicker(e.target.value.toUpperCase())}
             onKeyDown={handleKeyDown}
             className="border rounded px-3 py-2 flex-1"
             placeholder="AAPL"
+            maxLength={5}
           />
           <button
             onClick={handleSearch}
@@ -58,6 +75,8 @@ function App() {
             {loading ? "Analyzing..." : "Analyze"}
           </button>
         </div>
+
+        <RecentSearches recent={recent} onSelect={runSearch} />
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 rounded p-4 mb-6">
