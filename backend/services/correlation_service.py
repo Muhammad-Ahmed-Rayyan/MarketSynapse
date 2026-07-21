@@ -60,6 +60,7 @@ def _determine_alignment(sentiment_label: str, price_change_pct: float) -> str:
         return "mixed"
     return "diverged"  # e.g. positive sentiment but price fell
 
+
 def get_correlation_summary(ticker: str, days_back: int = 7) -> CorrelationSummary:
     cache_key = f"correlation:{ticker.upper()}:{days_back}"
     cached = cache_service.get(cache_key)
@@ -84,6 +85,10 @@ def get_correlation_summary(ticker: str, days_back: int = 7) -> CorrelationSumma
         articles=articles,
         price=price,
     )
+
+    from backend.services.history_service import save_snapshot
+    save_snapshot(summary)
+
     cache_service.set(cache_key, summary)
     return summary
 

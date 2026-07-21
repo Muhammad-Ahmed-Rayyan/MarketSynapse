@@ -1,1 +1,90 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
+
+:root {
+  --signal-positive: #00d9a3;
+  --signal-negative: #ff5c5c;
+  --signal-mixed: #ffb020;
+}
+
+[data-theme="dark"] {
+  --bg-base: #0a0f0d;
+  --bg-surface: #141a18;
+  --bg-surface-raised: #1a2220;
+  --border-hairline: #232e2a;
+  --border-strong: #2e3b36;
+  --text-primary: #eef1ef;
+  --text-secondary: #8a9490;
+  --text-tertiary: #4f5b56;
+}
+
+[data-theme="light"] {
+  --bg-base: #f7f8fa;
+  --bg-surface: #ffffff;
+  --bg-surface-raised: #f0f2f5;
+  --border-hairline: #e2e5ea;
+  --border-strong: #c9cdd6;
+  --text-primary: #12161c;
+  --text-secondary: #5b6472;
+  --text-tertiary: #8a92a0;
+}
+
+html,
+body {
+  background: var(--bg-base);
+  transition: background 0.2s ease;
+}
+
+body {
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: "Space Grotesk", "Inter", sans-serif;
+}
+
+.font-mono {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+::selection {
+  background: var(--signal-positive);
+  color: #04342c;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-rise {
+  animation: rise-in 0.35s ease-out both;
+}
+/* Print view: hide interactive chrome, keep the report content readable
+   on a light background regardless of the active dark/light theme. */
+@media print {
+  body {
+    background: white !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+
+  * {
+    color: black !important;
+    background: white !important;
+    border-color: #ccc !important;
+    box-shadow: none !important;
+  }
+
+  a {
+    text-decoration: underline !important;
+  }
+}

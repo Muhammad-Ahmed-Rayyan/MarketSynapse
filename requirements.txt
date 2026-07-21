@@ -6,7 +6,9 @@ requests
 python-dotenv
 transformers==4.40.0
 torch==2.3.0
-yfinance==0.2.40
+yfinance>=1.5.1
 langchain-groq==0.2.4
-langgraph==0.2.0
-langchain-core==0.3.28
+langgraph>=0.2.0
+langchain-core>=0.3.33,<0.4.0
+sqlalchemy>=2.0.0
+pytest>=7.0.0
