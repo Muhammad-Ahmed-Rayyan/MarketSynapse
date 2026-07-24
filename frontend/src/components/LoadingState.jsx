@@ -1,13 +1,13 @@
 export default function LoadingState() {
+  const shimmer = { background: "var(--bg-surface)", border: "1px solid var(--border-hairline)" };
   return (
-    <div className="space-y-4 animate-pulse">
-      <div className="flex gap-3">
-        <div className="h-7 w-32 bg-gray-200 rounded-full" />
-        <div className="h-7 w-40 bg-gray-200 rounded-full" />
+    <div className="space-y-5 animate-pulse">
+      <div className="grid md:grid-cols-2 gap-5">
+        <div className="h-40 rounded-lg" style={shimmer} />
+        <div className="h-40 rounded-lg" style={shimmer} />
       </div>
-      <div className="h-24 bg-gray-200 rounded-lg" />
-      <div className="h-40 bg-gray-200 rounded-lg" />
-      <div className="h-32 bg-gray-200 rounded-lg" />
+      <div className="h-24 rounded-lg" style={shimmer} />
+      <div className="h-56 rounded-lg" style={shimmer} />
     </div>
   );
 }

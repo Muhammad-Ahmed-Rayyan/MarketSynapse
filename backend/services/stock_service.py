@@ -22,11 +22,33 @@ class PriceSummary(BaseModel):
     change_pct: Optional[float] = None       # over the requested window
     period_days: int
     history: list[PricePoint]
-
+    next_earnings_date: Optional[str] = None  # ISO date string, None if unavailable
 
 class StockServiceError(Exception):
     pass
-
+def _get_next_earnings_date(stock: yf.Ticker) -> Optional[str]:
+    """
+    Best-effort lookup of the next earnings date via yfinance's calendar.
+    Returns None (not an error) if unavailable — earnings data is often
+    missing/inconsistent on yfinance depending on the ticker and timing,
+    and this feature should degrade gracefully rather than break the
+    whole price fetch over a missing calendar.
+    """
+    try:
+        calendar = stock.calendar
+        if not calendar:
+            return None
+        # yfinance's calendar shape has varied across versions — handle
+        # both a dict-like and DataFrame-like return defensively.
+        earnings_dates = calendar.get("Earnings Date") if hasattr(calendar, "get") else None
+        if not earnings_dates:
+            return None
+        first_date = earnings_dates[0] if isinstance(earnings_dates, list) else earnings_dates
+        return str(first_date)
+    except Exception:
+        # Any failure here (missing data, format change, etc.) should not
+        # break price fetching — earnings info is a nice-to-have, not core.
+        return None
 
 def fetch_price_summary(ticker: str, days_back: int = 7) -> PriceSummary:
     ticker = ticker.upper().strip()
@@ -54,12 +76,15 @@ def fetch_price_summary(ticker: str, days_back: int = 7) -> PriceSummary:
     last_close = history[-1].close
     change_pct = round(((last_close - first_close) / first_close) * 100, 2) if first_close else None
 
+    next_earnings_date = _get_next_earnings_date(stock)
+
     return PriceSummary(
         ticker=ticker,
         current_price=last_close,
         change_pct=change_pct,
         period_days=days_back,
         history=history,
+        next_earnings_date=next_earnings_date,
     )
 
 
@@ -70,6 +95,7 @@ if __name__ == "__main__":
     try:
         summary = fetch_price_summary(ticker_arg)
         print(f"{summary.ticker}: ${summary.current_price} ({summary.change_pct:+.2f}% over {summary.period_days}d)")
+        print(f"Next earnings date: {summary.next_earnings_date or 'unavailable'}")
         for p in summary.history:
             print(f"  {p.date}: ${p.close}")
     except StockServiceError as e:
