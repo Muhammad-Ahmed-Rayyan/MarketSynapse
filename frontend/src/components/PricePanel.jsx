@@ -1,4 +1,4 @@
-import { AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Brush } from "recharts";
 
 const sentimentColor = {
   positive: "var(--signal-positive)",
@@ -49,7 +49,7 @@ export default function PricePanel({ price, articles }) {
         ${price.current_price}
       </p>
 
-      <div style={{ height: 180 }}>
+      <div style={{ height: 210 }}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={price.history}>
             <defs>
@@ -93,6 +93,14 @@ export default function PricePanel({ price, articles }) {
               fill={`url(#${gradientId})`}
               dot={{ r: 3, fill: trendColorHex, strokeWidth: 0 }}
               activeDot={{ r: 5 }}
+            />
+            <Brush
+              dataKey="date"
+              height={24}
+              stroke="var(--signal-positive)"
+              fill="var(--bg-surface-raised)"
+              tickFormatter={(d) => d.slice(5)}
+              travellerWidth={8}
             />
           </AreaChart>
         </ResponsiveContainer>

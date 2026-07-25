@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTheme } from "./hooks/useTheme";
+import Logo from "./components/Logo";
 import SignalReadout from "./components/SignalReadout";
 import PricePanel from "./components/PricePanel";
 import BriefCard from "./components/BriefCard";
@@ -12,6 +13,8 @@ import SentimentTrendChart from "./components/SentimentTrendChart";
 import CompareView from "./components/CompareView";
 import { fetchReport, fetchHistory } from "./services/api";
 import Watchlist from "./components/Watchlist";
+import MarketStatusBadge from "./components/MarketStatusBadge";
+import LastUpdated from "./components/LastUpdated";
 
 const isValidTicker = (t) => /^[A-Z]{1,5}$/.test(t);
 const MAX_RECENT = 5;
@@ -25,6 +28,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [recent, setRecent] = useState([]);
+  const [lastUpdated, setLastUpdated] = useState(null);
 
   const addRecentSearch = (t) => {
     setRecent((prev) => [t, ...prev.filter((x) => x !== t)].slice(0, MAX_RECENT));
@@ -43,6 +47,7 @@ function App() {
     try {
       const data = await fetchReport(trimmed);
       setReport(data);
+      setLastUpdated(new Date());
       addRecentSearch(trimmed);
 
       const historyData = await fetchHistory(trimmed);
@@ -63,19 +68,25 @@ function App() {
     <div className="min-h-screen" style={{ background: "var(--bg-base)" }}>
       <div className="max-w-4xl mx-auto px-5 py-10 md:py-14">
         <header className="flex items-end justify-between flex-wrap gap-4 mb-8 pb-6 border-b" style={{ borderColor: "var(--border-hairline)" }}>
-          <div>
-            <h1
-              className="font-display text-2xl md:text-[28px] font-semibold tracking-tight"
-              style={{ color: "var(--text-primary)" }}
-            >
-              MarketSynapse
-            </h1>
-            <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
-              News sentiment <span style={{ color: "var(--text-tertiary)" }}>×</span> price movement{" "}
-              <span style={{ color: "var(--text-tertiary)" }}>×</span> AI-generated market brief
-            </p>
+          <div className="flex items-center gap-3">
+            <Logo />
+            <div>
+              <h1
+                className="font-display text-2xl md:text-[28px] font-semibold tracking-tight"
+                style={{ color: "var(--text-primary)" }}
+              >
+                MarketSynapse
+              </h1>
+              <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+                News sentiment <span style={{ color: "var(--text-tertiary)" }}>×</span> price movement{" "}
+                <span style={{ color: "var(--text-tertiary)" }}>×</span> AI-generated market brief
+              </p>
+            </div>
           </div>
-          <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          <div className="flex items-center gap-4">
+            <MarketStatusBadge />
+            <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          </div>
         </header>
 
         <div
@@ -170,6 +181,9 @@ function App() {
 
             {!loading && report && (
               <div className="space-y-5 animate-rise">
+                <div className="flex justify-end">
+                  <LastUpdated timestamp={lastUpdated} loading={loading} onRefresh={() => runSearch(ticker)} />
+                </div>
                 <div className="grid md:grid-cols-2 gap-5">
                   <PricePanel price={report.analysis.price} articles={report.analysis.articles} />
                   <SignalReadout

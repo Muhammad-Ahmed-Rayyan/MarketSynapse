@@ -93,20 +93,21 @@ def review_brief(state: AgentState) -> AgentState:
     model would likely handle this more consistently; noted here rather
     than solved, since chasing prompt tweaks further showed diminishing and
     inconsistent returns.
+
+    Also strips any leftover meta-commentary as a safety net (see
+    _strip_meta_commentary) — the model occasionally narrates its own edit
+    process despite instructions not to, and this catches that case.
     """
     system = SystemMessage(content=(
-        "You are a strict editor reviewing a financial market brief before publication. "
-        "You will be given the SOURCE FACTS the brief was supposed to be based on, and "
-        "the DRAFT BRIEF itself. Check the draft against exactly two rules:\n\n"
-        "1. Does it mention any specific product, event, launch, number, or detail that "
-        "is NOT present in the source facts? (Hallucination check)\n"
-        "2. Does it give investment advice or a recommendation — any phrase like 'buy', "
-        "'sell', 'you should', 'consider investing', or a price prediction? (Advice check)\n\n"
-        "If the draft violates either rule, rewrite it to remove the violation while "
-        "keeping everything else intact, and output ONLY the corrected brief text.\n"
-        "If the draft violates neither rule, output the draft brief exactly as given, "
-        "unchanged, with no commentary.\n"
-        "Do not add any preamble, explanation, or notes — output only the final brief text."
+        "Task: silently fix a financial market brief if it breaks either rule below. "
+        "Rule 1 — no product, event, launch, or detail beyond what's in SOURCE FACTS. "
+        "Rule 2 — no investment advice ('buy', 'sell', 'you should', a price prediction).\n\n"
+        "Output format is strict: your entire response is ONLY the brief itself — "
+        "3-4 sentences of plain analyst prose. Never write things like 'The draft "
+        "mentions...', 'Corrected version:', 'Here is the fixed brief:', or any other "
+        "framing, label, or explanation. If nothing is wrong, output the draft unchanged. "
+        "If something is wrong, silently output the fixed version — as if you'd written "
+        "it correctly the first time."
     ))
     user = HumanMessage(content=(
         f"SOURCE FACTS:\n{state['facts']}\n\n"
@@ -114,15 +115,23 @@ def review_brief(state: AgentState) -> AgentState:
     ))
 
     response = llm.invoke([system, user])
-    return {**state, "brief": response.content}
+    return {**state, "brief": _strip_meta_commentary(response.content.strip())}
 
-    user = HumanMessage(content=(
-        f"SOURCE FACTS:\n{state['facts']}\n\n"
-        f"DRAFT BRIEF:\n{state['brief']}"
-    ))
 
-    response = llm.invoke([system, user])
-    return {**state, "brief": response.content}
+def _strip_meta_commentary(text: str) -> str:
+    """
+    Safety net for review_brief: if the model narrates its edit instead of
+    just outputting the brief, the actual brief is almost always the last
+    paragraph, often after a marker phrase like 'Corrected Draft Brief:'.
+    Trim anything before the last such marker if one is present.
+    """
+    markers = ["corrected draft brief:", "corrected brief:", "final brief:", "revised brief:"]
+    lowered = text.lower()
+    for marker in markers:
+        idx = lowered.rfind(marker)
+        if idx != -1:
+            return text[idx + len(marker):].strip()
+    return text
 
 
 def build_graph():
