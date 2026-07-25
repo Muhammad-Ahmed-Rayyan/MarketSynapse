@@ -9,7 +9,7 @@ const sentimentColor = {
 export default function PricePanel({ price, articles }) {
   const isUp = price.change_pct >= 0;
   const trendColor = isUp ? "var(--signal-positive)" : "var(--signal-negative)";
-  const trendColorHex = isUp ? "#00d9a3" : "#ff5c5c";
+  const trendColorHex = isUp ? "#d3ff52" : "#ff5c5c";
   const gradientId = `priceGradient-${price.ticker}`;
 
   // Group counts for a proportional allocation-style bar, instead of one

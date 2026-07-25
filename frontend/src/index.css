@@ -2,7 +2,7 @@
 @import "tailwindcss";
 
 :root {
-  --signal-positive: #00d9a3;
+  --signal-positive: #d3ff52;
   --signal-negative: #ff5c5c;
   --signal-mixed: #ffb020;
 }
@@ -22,8 +22,8 @@
   --bg-base: #f7f8fa;
   --bg-surface: #ffffff;
   --bg-surface-raised: #f0f2f5;
-  --border-hairline: #e2e5ea;
-  --border-strong: #c9cdd6;
+  --border-hairline: #b0b4bd;
+  --border-strong: #8b909b;
   --text-primary: #12161c;
   --text-secondary: #5b6472;
   --text-tertiary: #8a92a0;
@@ -49,7 +49,7 @@ body {
 
 ::selection {
   background: var(--signal-positive);
-  color: #04342c;
+  color: #141a04;
 }
 
 @keyframes rise-in {

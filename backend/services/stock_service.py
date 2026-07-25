@@ -4,6 +4,7 @@ Price data via yfinance.
 No API key needed — yfinance scrapes Yahoo Finance's public endpoints.
 Trade-off: no formal rate-limit guarantee, so don't hammer it in a loop.
 """
+import math
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -68,13 +69,24 @@ def fetch_price_summary(ticker: str, days_back: int = 7) -> PriceSummary:
         )
 
     history = [
-        PricePoint(date=idx.strftime("%Y-%m-%d"), close=round(float(row["Close"]), 2))
-        for idx, row in hist.iterrows()
-    ]
+            PricePoint(date=idx.strftime("%Y-%m-%d"), close=round(float(row["Close"]), 2))
+            for idx, row in hist.iterrows()
+            if not math.isnan(row["Close"])
+        ]
+
+    if not history:
+        raise StockServiceError(
+            f"No usable price data found for ticker '{ticker}' — all rows had missing prices "
+            f"(often happens if the market's closed for the whole window)"
+        )
 
     first_close = history[0].close
     last_close = history[-1].close
-    change_pct = round(((last_close - first_close) / first_close) * 100, 2) if first_close else None
+    change_pct = (
+        round(((last_close - first_close) / first_close) * 100, 2)
+        if first_close and not math.isnan(first_close)
+        else 0.0
+    )
 
     next_earnings_date = _get_next_earnings_date(stock)
 

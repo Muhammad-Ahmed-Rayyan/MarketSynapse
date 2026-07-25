@@ -87,7 +87,7 @@ function App() {
             className="font-mono text-xs px-4 py-1.5 rounded-full transition"
             style={{
               background: mode === "single" ? "var(--signal-positive)" : "transparent",
-              color: mode === "single" ? "#04342c" : "var(--text-secondary)",
+              color: mode === "single" ? "#141a04" : "var(--text-secondary)",
             }}
           >
             Single
@@ -97,7 +97,7 @@ function App() {
             className="font-mono text-xs px-4 py-1.5 rounded-full transition"
             style={{
               background: mode === "compare" ? "var(--signal-positive)" : "transparent",
-              color: mode === "compare" ? "#04342c" : "var(--text-secondary)",
+              color: mode === "compare" ? "#141a04" : "var(--text-secondary)",
             }}
           >
             Compare
@@ -140,7 +140,7 @@ function App() {
                 className="font-display px-6 py-2.5 rounded-md text-sm font-semibold tracking-wide transition disabled:opacity-40"
                 style={{
                   background: "var(--signal-positive)",
-                  color: "#04342c",
+                  color: "#141a04",
                 }}
               >
                 {loading ? "Analyzing…" : "Analyze"}
