@@ -7,6 +7,7 @@ price change_pct over the same window. The LangGraph agent (Day 5)
 is where the real reasoning happens — this just gives it clean
 pre-aggregated numbers to work with instead of raw article lists.
 """
+import math
 from pydantic import BaseModel
 from backend.services import cache_service
 from backend.models.schemas import Article
