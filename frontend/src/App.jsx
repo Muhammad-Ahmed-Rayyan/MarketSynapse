@@ -15,6 +15,7 @@ import { fetchReport, fetchHistory } from "./services/api";
 import Watchlist from "./components/Watchlist";
 import MarketStatusBadge from "./components/MarketStatusBadge";
 import LastUpdated from "./components/LastUpdated";
+import MarketPulse from "./components/MarketPulse";
 
 const isValidTicker = (t) => /^[A-Z]{1,5}$/.test(t);
 const MAX_RECENT = 5;
@@ -23,7 +24,7 @@ function App() {
   const { theme, toggleTheme } = useTheme();
   const [mode, setMode] = useState("single"); // "single" | "compare"
   const [history, setHistory] = useState([]);
-  const [ticker, setTicker] = useState("AAPL");
+  const [ticker, setTicker] = useState("");
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -35,29 +36,37 @@ function App() {
   };
 
   const runSearch = async (rawTicker) => {
-    const trimmed = rawTicker.trim().toUpperCase();
-    if (!isValidTicker(trimmed)) {
-      setError("Enter a valid ticker symbol — 1 to 5 letters, e.g. AAPL");
-      return;
-    }
-    setTicker(trimmed);
-    setLoading(true);
-    setError(null);
-    setReport(null);
-    try {
-      const data = await fetchReport(trimmed);
-      setReport(data);
-      setLastUpdated(new Date());
-      addRecentSearch(trimmed);
+      const trimmed = rawTicker.trim().toUpperCase();
+      if (!isValidTicker(trimmed)) {
+        setError("Enter a valid ticker symbol — 1 to 5 letters, e.g. AAPL");
+        return;
+      }
+      setTicker(trimmed);
+      setLoading(true);
+      setError(null);
+      setReport(null);
 
-      const historyData = await fetchHistory(trimmed);
-      setHistory(historyData.history);
-    } catch (err) {
-      setError(err.message);
-    } finally {
+      try {
+        const data = await fetchReport(trimmed);
+        setReport(data);
+        setLastUpdated(new Date());
+        addRecentSearch(trimmed);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+        return;
+      }
       setLoading(false);
-    }
-  };
+
+      // History is supplementary — a slow/failed fetch shouldn't delay the
+      // main report or make "last updated" misleading about report freshness.
+      try {
+        const historyData = await fetchHistory(trimmed);
+        setHistory(historyData.history);
+      } catch {
+        setHistory([]);
+      }
+    };
 
   const handleSearch = () => runSearch(ticker);
   const handleKeyDown = (e) => {
@@ -69,7 +78,7 @@ function App() {
       <div className="max-w-4xl mx-auto px-5 py-10 md:py-14">
         <header className="flex items-end justify-between flex-wrap gap-4 mb-8 pb-6 border-b" style={{ borderColor: "var(--border-hairline)" }}>
           <div className="flex items-center gap-3">
-            <Logo />
+            <Logo size={44} />
             <div>
               <h1
                 className="font-display text-2xl md:text-[28px] font-semibold tracking-tight"
@@ -177,7 +186,12 @@ function App() {
             )}
 
             {loading && <LoadingState />}
-            {!loading && !report && !error && <EmptyState />}
+                    {!loading && !report && !error && (
+                      <>
+                        <MarketPulse onSelect={runSearch} />
+                        <EmptyState />
+                      </>
+                    )}            
 
             {!loading && report && (
               <div className="space-y-5 animate-rise">

@@ -59,3 +59,12 @@ export async function removeFromWatchlist(ticker) {
   if (!response.ok) throw new Error(`Request failed: ${response.status}`);
   return response.json();
 }
+
+export async function fetchStock(ticker) {
+  const response = await fetch(`${API_URL}/stock/${ticker}`);
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.detail || `Request failed: ${response.status}`);
+  }
+  return response.json();
+}

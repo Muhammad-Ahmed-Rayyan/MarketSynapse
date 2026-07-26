@@ -7,8 +7,8 @@ import LoadingState from "./LoadingState";
 const isValidTicker = (t) => /^[A-Z]{1,5}$/.test(t);
 
 export default function CompareView() {
-  const [tickerA, setTickerA] = useState("AAPL");
-  const [tickerB, setTickerB] = useState("MSFT");
+  const [tickerA, setTickerA] = useState("");
+  const [tickerB, setTickerB] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

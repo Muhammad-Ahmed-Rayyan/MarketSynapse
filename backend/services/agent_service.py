@@ -82,7 +82,7 @@ def review_brief(state: AgentState) -> AgentState:
     truth. Rewrites only on a genuine violation; otherwise passes through
     unchanged, so this doesn't degrade an already-compliant brief.
 
-    Known limitation (measured via tests/test_review_brief.py): reliably
+    Known limitation (observed during manual testing): reliably
     catches explicit investment-advice language, but is less reliable at
     catching subtler hallucinated entities/events not present in the source
     facts. This appears to be a capability limit of the small, fast model

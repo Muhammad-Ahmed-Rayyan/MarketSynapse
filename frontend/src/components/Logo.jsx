@@ -1,7 +1,14 @@
 export default function Logo({ size = 28 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" className="flex-shrink-0">
-      <rect width="32" height="32" rx="8" fill="var(--bg-surface-raised)" />
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 32 32"
+      className="flex-shrink-0"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect width="32" height="32" rx="8" fill="#1a1a1a" />
       <circle cx="9" cy="22" r="3" fill="var(--signal-positive)" />
       <circle cx="23" cy="22" r="3" fill="var(--signal-positive)" />
       <circle cx="16" cy="9" r="3.5" fill="var(--signal-positive)" />

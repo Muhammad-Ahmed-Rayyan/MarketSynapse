@@ -12,6 +12,7 @@ export default function MarketStatusBadge() {
   return (
     <div className="flex items-center gap-1.5 font-mono text-[11px]" style={{ color: "var(--text-tertiary)" }}>
       <span
+        aria-hidden="true"
         className="w-1.5 h-1.5 rounded-full"
         style={{
           background: open ? "var(--signal-positive)" : "var(--text-tertiary)",

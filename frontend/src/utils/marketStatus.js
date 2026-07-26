@@ -1,17 +1,21 @@
-// US market hours (NYSE/NASDAQ): 9:30–16:00 ET, Mon–Fri.
-// Approximated using UTC offset; doesn't account for DST switch day itself,
-// which is an acceptable simplification for a status indicator.
 export function isMarketOpen() {
   const now = new Date();
-  const utcHour = now.getUTCHours();
-  const utcMinute = now.getUTCMinutes();
-  const day = now.getUTCDay(); // 0 = Sunday
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: false,
+    weekday: "short",
+  }).formatToParts(now);
 
-  if (day === 0 || day === 6) return false;
+  const weekday = parts.find((p) => p.type === "weekday").value;
+  const hour = parseInt(parts.find((p) => p.type === "hour").value, 10);
+  const minute = parseInt(parts.find((p) => p.type === "minute").value, 10);
 
-  // ET is UTC-4 (EDT, most of the year) — 9:30 ET = 13:30 UTC, 16:00 ET = 20:00 UTC
-  const minutesUTC = utcHour * 60 + utcMinute;
-  return minutesUTC >= 13 * 60 + 30 && minutesUTC < 20 * 60;
+  if (weekday === "Sat" || weekday === "Sun") return false;
+
+  const minutesET = hour * 60 + minute;
+  return minutesET >= 9 * 60 + 30 && minutesET < 16 * 60;
 }
 
 export function timeAgo(date) {
