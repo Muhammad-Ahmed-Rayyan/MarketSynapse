@@ -63,6 +63,42 @@ body {
   }
 }
 
+@keyframes flow-dash {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+.diagram-flow-line {
+  stroke-dasharray: 4 4;
+  animation: flow-dash 1.2s linear infinite;
+}
+
+@keyframes node-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 0px var(--signal-positive));
+  }
+  50% {
+    filter: drop-shadow(0 0 5px var(--signal-positive));
+  }
+}
+.diagram-pulse {
+  animation: node-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes diagram-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.diagram-fade {
+  animation: diagram-fade-in 0.5s ease-out both;
+}
+
 .animate-rise {
   animation: rise-in 0.35s ease-out both;
 }

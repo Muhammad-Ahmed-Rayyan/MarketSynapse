@@ -16,6 +16,9 @@ import Watchlist from "./components/Watchlist";
 import MarketStatusBadge from "./components/MarketStatusBadge";
 import LastUpdated from "./components/LastUpdated";
 import MarketPulse from "./components/MarketPulse";
+import HowItWorks from "./components/HowItWorks";
+import Footer from "./components/Footer";
+import Disclaimer from "./components/Disclaimer";
 
 const isValidTicker = (t) => /^[A-Z]{1,5}$/.test(t);
 const MAX_RECENT = 5;
@@ -23,6 +26,7 @@ const MAX_RECENT = 5;
 function App() {
   const { theme, toggleTheme } = useTheme();
   const [mode, setMode] = useState("single"); // "single" | "compare"
+  const [page, setPage] = useState("dashboard"); // "dashboard" | "how-it-works"
   const [history, setHistory] = useState([]);
   const [ticker, setTicker] = useState("");
   const [report, setReport] = useState(null);
@@ -73,6 +77,14 @@ function App() {
     if (e.key === "Enter") handleSearch();
   };
 
+  if (page === "how-it-works") {
+    return (
+      <div className="min-h-screen" style={{ background: "var(--bg-base)" }}>
+        <HowItWorks onBack={() => setPage("dashboard")} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen" style={{ background: "var(--bg-base)" }}>
       <div className="max-w-4xl mx-auto px-5 py-10 md:py-14">
@@ -98,29 +110,52 @@ function App() {
           </div>
         </header>
 
-        <div
-          className="inline-flex p-1 rounded-full mb-5"
-          style={{ background: "var(--bg-surface)", border: "1px solid var(--border-hairline)" }}
-        >
+        <div className="flex items-center justify-between mb-5">
+          <div
+            className="inline-flex p-1 rounded-full"
+            style={{ background: "var(--bg-surface)", border: "1px solid var(--border-hairline)" }}
+          >
+            <button
+              onClick={() => setMode("single")}
+              className="font-mono text-xs px-4 py-1.5 rounded-full transition"
+              style={{
+                background: mode === "single" ? "var(--signal-positive)" : "transparent",
+                color: mode === "single" ? "#141a04" : "var(--text-secondary)",
+              }}
+            >
+              Single
+            </button>
+            <button
+              onClick={() => setMode("compare")}
+              className="font-mono text-xs px-4 py-1.5 rounded-full transition"
+              style={{
+                background: mode === "compare" ? "var(--signal-positive)" : "transparent",
+                color: mode === "compare" ? "#141a04" : "var(--text-secondary)",
+              }}
+            >
+              Compare
+            </button>
+          </div>
+
           <button
-            onClick={() => setMode("single")}
+            type="button"
+            onClick={() => setPage("how-it-works")}
             className="font-mono text-xs px-4 py-1.5 rounded-full transition"
             style={{
-              background: mode === "single" ? "var(--signal-positive)" : "transparent",
-              color: mode === "single" ? "#141a04" : "var(--text-secondary)",
+              border: "1px solid var(--signal-positive)",
+              background: "var(--signal-positive)",
+              color: "#141a04",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.color = "var(--signal-positive)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "var(--signal-positive)";
+              e.currentTarget.style.color = "#141a04";
             }}
           >
-            Single
-          </button>
-          <button
-            onClick={() => setMode("compare")}
-            className="font-mono text-xs px-4 py-1.5 rounded-full transition"
-            style={{
-              background: mode === "compare" ? "var(--signal-positive)" : "transparent",
-              color: mode === "compare" ? "#141a04" : "var(--text-secondary)",
-            }}
-          >
-            Compare
+            How it works
           </button>
         </div>
 
@@ -211,13 +246,12 @@ function App() {
                 <ArticleList articles={report.analysis.articles} />
                 <SentimentTrendChart history={history} />
 
-                <p className="text-xs text-center pt-2" style={{ color: "var(--text-tertiary)" }}>
-                  Educational and informational only — not financial advice.
-                </p>
+                <Disclaimer />
               </div>
             )}
           </>
         )}
+        <Footer />
       </div>
     </div>
   );
