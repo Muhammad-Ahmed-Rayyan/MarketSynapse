@@ -27,7 +27,9 @@ function PipelineDiagram() {
         </text>
       </g>
 
-      <path className="diagram-flow-line" d="M130 130 H175" stroke={lineColor} strokeWidth="1.5" markerEnd="url(#arrow)" />
+      {/* Ticker -> NewsAPI / yfinance (clean branch, both exit from the box edge) */}
+      <path className="diagram-flow-line" d="M130 118 H155 V67.5 H180" fill="none" stroke={lineColor} strokeWidth="1.5" markerEnd="url(#arrow)" />
+      <path className="diagram-flow-line" d="M130 142 H155 V192.5 H180" fill="none" stroke={lineColor} strokeWidth="1.5" markerEnd="url(#arrow)" />
 
       {/* Stage 2: Parallel fetch */}
       <g className="diagram-fade" style={{ animationDelay: "0.15s" }}>
@@ -40,10 +42,9 @@ function PipelineDiagram() {
         <text x="250" y="203" textAnchor="middle" fontSize="10" fill={subTextColor}>price history</text>
       </g>
 
-      <path className="diagram-flow-line" d="M70 100 V67 H180" fill="none" stroke={lineColor} strokeWidth="1.5" markerEnd="url(#arrow)" />
-      <path className="diagram-flow-line" d="M70 160 V193 H180" fill="none" stroke={lineColor} strokeWidth="1.5" markerEnd="url(#arrow)" />
-      <path className="diagram-flow-line" d="M320 67 H345 V115 H395" fill="none" stroke={lineColor} strokeWidth="1.5" markerEnd="url(#arrow)" />
-      <path className="diagram-flow-line" d="M320 193 H345 V145 H395" fill="none" stroke={lineColor} strokeWidth="1.5" markerEnd="url(#arrow)" />
+      {/* NewsAPI -> FinBERT, yfinance -> Correlation Engine: straight, box-edge to box-edge */}
+      <path className="diagram-flow-line" d="M320 67.5 H400" stroke={lineColor} strokeWidth="1.5" markerEnd="url(#arrow)" />
+      <path className="diagram-flow-line" d="M320 192.5 H400" stroke={lineColor} strokeWidth="1.5" markerEnd="url(#arrow)" />
 
       {/* Stage 3: Processing */}
       <g className="diagram-fade" style={{ animationDelay: "0.3s" }}>
@@ -60,7 +61,8 @@ function PipelineDiagram() {
         <text x="542" y="203" textAnchor="middle" fontSize="10" fill={subTextColor}>sentiment vs. price → alignment verdict</text>
       </g>
 
-      <path className="diagram-flow-line" d="M540 67 H565" stroke={lineColor} strokeWidth="1.5" markerEnd="url(#arrow)" />
+      {/* FinBERT -> Correlation Engine: this connection was missing before, now added */}
+      <path className="diagram-flow-line" d="M470 95 V165" fill="none" stroke={lineColor} strokeWidth="1.5" markerEnd="url(#arrow)" />
 
       {/* Stage 4: Agent */}
       <g className="diagram-fade" style={{ animationDelay: "0.45s" }}>
@@ -73,9 +75,14 @@ function PipelineDiagram() {
         <text x="640" y="78" textAnchor="middle" fontSize="10" fill={subTextColor}>3-node agent</text>
       </g>
 
+      {/* Correlation Engine -> LangGraph: this IS correct — the agent's input is the
+          correlation summary, not FinBERT's raw output directly */}
       <path className="diagram-flow-line" d="M650 165 V95" fill="none" stroke={lineColor} strokeWidth="1.5" markerEnd="url(#arrow)" />
-      <path className="diagram-flow-line" d="M710 67.5 H730 V152 H735" fill="none" stroke={lineColor} strokeWidth="1.5" markerEnd="url(#arrow)" />
-      <path className="diagram-flow-line" d="M685 192.5 H720 V140 H735" fill="none" stroke={lineColor} strokeWidth="1.5" markerEnd="url(#arrow)" />
+
+      {/* Correlation Engine -> Report (raw numbers) and LangGraph -> Report (written brief),
+          routed on separate x-columns so they enter Report at two distinct points, not merged */}
+      <path className="diagram-flow-line" d="M685 190 H715 V140 H740" fill="none" stroke={lineColor} strokeWidth="1.5" markerEnd="url(#arrow)" />
+      <path className="diagram-flow-line" d="M710 60 H725 V115 H740" fill="none" stroke={lineColor} strokeWidth="1.5" markerEnd="url(#arrow)" />
 
       {/* Stage 5: Output */}
       <g className="diagram-fade" style={{ animationDelay: "0.6s" }}>

@@ -87,7 +87,7 @@ function App() {
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg-base)" }}>
-      <div className="max-w-4xl mx-auto px-5 py-10 md:py-14">
+      <div className="max-w-4xl mx-auto px-5 py-10 md:py-14 min-h-screen flex flex-col">
         <header className="flex items-end justify-between flex-wrap gap-4 mb-8 pb-6 border-b" style={{ borderColor: "var(--border-hairline)" }}>
           <div className="flex items-center gap-3">
             <Logo size={44} />

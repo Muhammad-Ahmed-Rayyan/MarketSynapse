@@ -1,15 +1,15 @@
 import { AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Brush } from "recharts";
 
 const sentimentColor = {
-  positive: "var(--signal-positive)",
-  negative: "var(--signal-negative)",
+  positive: "#22c55e",
+  negative: "#ef4444",
   neutral: "var(--border-strong)",
 };
 
 export default function PricePanel({ price, articles }) {
   const isUp = price.change_pct >= 0;
-  const trendColor = isUp ? "var(--signal-positive)" : "var(--signal-negative)";
-  const trendColorHex = isUp ? "#d3ff52" : "#ff5c5c";
+  const trendColor = isUp ? "#22c55e" : "#ef4444";
+  const trendColorHex = trendColor;
   const gradientId = `priceGradient-${price.ticker}`;
 
   // Group counts for a proportional allocation-style bar, instead of one
