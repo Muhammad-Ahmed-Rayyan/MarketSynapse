@@ -1,136 +1,240 @@
-# MarketSynapse
+<div align="center">
+  <img src="MarketSynapse.png" width="500">
+  
+  #
+   
+  <p><b>Real-Time Financial Intelligence Combining News Sentiment, Price Action & AI-Generated Market Briefs</b></p>
+ 
+![Last Commit](https://img.shields.io/github/last-commit/Muhammad-Ahmed-Rayyan/MarketSynapse)
+![Python](https://img.shields.io/badge/Python-Backend-blue?logo=python)
+![JavaScript](https://img.shields.io/badge/JavaScript-Frontend-yellow?logo=javascript)
+![languages](https://img.shields.io/github/languages/count/Muhammad-Ahmed-Rayyan/MarketSynapse)
 
-Real-time financial intelligence: live news → FinBERT sentiment → price correlation → LLM-generated market brief, with historical tracking, multi-ticker comparison, and a self-correcting brief pipeline.
+<br>
 
-> Educational/informational project only. Not financial advice.
+Built with the tools and technologies:  
+![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-%2361DAFB.svg?style=for-the-badge&logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![HuggingFace](https://img.shields.io/badge/HuggingFace-f7aa00?style=for-the-badge&logo=huggingface&logoColor=white)
+![LangChain](https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
 
-## Status
-✅ Phase 1 (core pipeline + React dashboard) complete.
-✅ Phase 2 (historical tracking, smarter agent, tests, product features) complete.
-🚧 Deployment (Railway + Vercel) not yet started — running locally.
+</div>
 
-## Quickstart
+---
+
+## 🧠 Project Summary
+
+**MarketSynapse** is a real-time financial intelligence platform that combines live news sentiment, price movement, and an AI-generated market brief into a single view. It runs a self-correcting LangGraph agent that drafts, reviews, and revises its own analysis before showing it to the user, and persists every result so sentiment trends can be tracked over time.
+
+Enter a ticker and MarketSynapse:
+1. Pulls recent news, filtered for actual relevance to that company
+2. Scores sentiment with **FinBERT**, a finance-domain sentiment model
+3. Pulls price history via **yfinance**
+4. Correlates the two into an **alignment verdict** — did sentiment match price, or diverge?
+5. Runs a 3-node **LangGraph** agent that writes a plain-English brief, then reviews and self-corrects its own draft
+6. Persists the result so sentiment trends are visible over time
+
+See the in-app **"How it works"** page for a full pipeline diagram and an honest list of known limitations.
+
+---
+
+## 🚀 Features
+
+- 🔍 **Single-Ticker Analysis** — price, sentiment, alignment verdict, AI brief, and headline list in one view
+- ⚖️ **Compare Mode** — two tickers side-by-side with a comparative AI brief
+- 📊 **Sentiment Trend Chart** — historical sentiment pulled from a local SQLite log
+- 📡 **Market Pulse** — live snapshot of major tickers shown before you've searched anything
+- ⭐ **Watchlist** — save tickers for quick access
+- 📤 **Export** — copy the brief or print/save as PDF
+- 🌓 **Dark/Light Theme** — with system-preference detection
+- 🔎 **Zoomable Charts** — drag to zoom into any date range on price/sentiment charts
+- 🤖 **Self-Correcting AI Agent** — a review node checks and revises the brief before it's shown
+- 🕵️ **Relevance-Filtered News** — articles are filtered so only genuinely relevant coverage reaches sentiment scoring
+
+---
+
+## 🗃️ Project Structure
 
 ```bash
-git clone <your-repo-url> marketsynapse
-cd marketsynapse
-
-python -m venv .venv
-source .venv/bin/activate      # Windows: .venv\Scripts\activate
-
-pip install -r requirements.txt
-
-cp .env.example .env
-# Add your NEWS_API_KEY (https://newsapi.org) and GROQ_API_KEY (https://console.groq.com)
-
-uvicorn backend.main:app --reload
-# Visit http://localhost:8000/docs for interactive Swagger UI
+marketsynapse/
+├── backend/
+│   ├── main.py                    # FastAPI app entry point, CORS, router registration
+│   ├── config.py                  # pydantic-settings, loads .env
+│   ├── routers/
+│   │   ├── news.py                # GET /news/{ticker}
+│   │   ├── stock.py                # GET /stock/{ticker}
+│   │   ├── correlation.py          # GET /analyze/{ticker}
+│   │   ├── brief.py                # GET /brief/{ticker}
+│   │   ├── report.py               # GET /report/{ticker}  <- unified endpoint
+│   │   ├── history.py              # GET /history/{ticker}
+│   │   ├── compare.py              # GET /compare?tickers=AAPL,MSFT
+│   │   └── watchlist.py            # GET/POST/DELETE /watchlist
+│   ├── services/
+│   │   ├── news_service.py         # NewsAPI integration + relevance filtering
+│   │   ├── sentiment_service.py    # FinBERT sentiment analysis
+│   │   ├── stock_service.py        # yfinance price data
+│   │   ├── correlation_service.py  # combines sentiment + price, caches, logs history
+│   │   ├── agent_service.py        # LangGraph agent: extract_facts -> write_brief -> review_brief
+│   │   ├── comparison_service.py   # multi-ticker comparison agent
+│   │   ├── history_service.py      # persists + retrieves sentiment snapshots
+│   │   └── cache_service.py        # in-memory TTL cache (5 min default)
+│   ├── models/schemas.py
+│   └── database/
+│       ├── db.py                   # SQLAlchemy engine/session
+│       └── models.py               # SentimentHistory table
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── services/api.js
+│   │   ├── utils/marketStatus.js   # market open/closed check, DST-safe
+│   │   └── components/
+│   │       ├── Logo.jsx
+│   │       ├── Footer.jsx
+│   │       ├── HowItWorks.jsx      # architecture page with animated diagrams
+│   │       ├── PricePanel.jsx
+│   │       ├── SignalReadout.jsx
+│   │       ├── SentimentTrendChart.jsx
+│   │       ├── CompareView.jsx
+│   │       ├── MarketPulse.jsx     # live ticker strip shown on empty state
+│   │       ├── Watchlist.jsx
+│   │       ├── BriefCard.jsx
+│   │       ├── ArticleList.jsx
+│   │       ├── RecentSearches.jsx
+│   │       ├── MarketStatusBadge.jsx
+│   │       ├── LastUpdated.jsx
+│   │       ├── Disclaimer.jsx
+│   │       ├── EmptyState.jsx
+│   │       ├── LoadingState.jsx
+│   │       └── ThemeToggle.jsx
+│   └── vite.config.js              # includes @tailwindcss/vite plugin
+├── tests/
+│   ├── test_news_service.py
+│   ├── test_correlation_service.py
+│   ├── test_stock_service.py
+│   └── eval_brief.py               # rubric-scored eval harness for LLM briefs
+├── requirements.txt
+├── .env.example
+├── README.md
+├── LICENSE
+└── .gitignore
 ```
 
-In a separate terminal, for the frontend:
+---
+
+## 🔧 Setup & Installation
+
+> Make sure **Python 3.9+** and **Node.js** with **npm** are installed on your system.
+
+### ⚙️ Backend
 
 ```bash
+# Clone the repo
+git clone https://github.com/Muhammad-Ahmed-Rayyan/MarketSynapse.git
+cd MarketSynapse
+
+# Create and activate a virtual environment
+python3 -m venv venv
+source venv/bin/activate      # Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure environment variables
+cp .env.example .env
+# Add your NEWS_API_KEY (newsapi.org) and GROQ_API_KEY (console.groq.com)
+
+# Run the backend
+uvicorn backend.main:app --reload
+```
+
+### 💻 Frontend
+
+```bash
+# In a separate terminal
 cd frontend
+
+# Install dependencies
 npm install
+
 # Create frontend/.env with: VITE_API_URL=http://localhost:8000
+
+# Run the development server
 npm run dev
 ```
 
-Both servers must run simultaneously (backend on `:8000`, frontend dev server on `:5173`).
+> Both servers must run simultaneously. `.env` files are gitignored — each person running this needs their own free API keys.
 
-**Note on the venv:** if you're on a fresh clone and hit `ModuleNotFoundError` for something already in `requirements.txt`, double-check the venv is actually activated in your current terminal (`.venv\Scripts\activate` on Windows) — every new terminal session needs this run again, it doesn't persist automatically.
+> **Windows note:** if `npm install` fails with a native-binding error (`rolldown-binding... not a valid Win32 application`), it's a known npm bug (npm/cli#4828) — delete `node_modules/` and `package-lock.json`, run `npm cache clean --force`, then reinstall.
 
-## Endpoints
+---
 
-| Endpoint | Description |
+## 🔑 API Configuration
+
+MarketSynapse requires API keys for **NewsAPI** and **Groq**. Update the backend `.env` file with your own credentials:
+
+```.env
+NEWS_API_KEY="YOUR-NEWSAPI-KEY"
+GROQ_API_KEY="YOUR-GROQ-API-KEY"
+```
+
+You can obtain these values from:
+
+- **NewsAPI:** Sign up at [newsapi.org](https://newsapi.org) to get a free API key.
+- **Groq:** Visit [console.groq.com](https://console.groq.com) to generate your API key (used for the `llama-3.1-8b-instant` model).
+
+The frontend also needs its own `.env`:
+
+```.env
+VITE_API_URL="http://localhost:8000"
+```
+
+---
+
+## 📚 API Endpoints
+
+| Endpoint | Returns |
 |---|---|
-| `GET /news/{ticker}` | Recent news articles for a ticker, filtered for relevance |
-| `GET /stock/{ticker}` | Price history, % change, and next earnings date (when available) |
-| `GET /analyze/{ticker}` | Combined sentiment + price with an alignment verdict (aligned/diverged/mixed) |
-| `GET /brief/{ticker}` | LLM-generated plain-English market brief (self-reviewed for hallucinations/advice) |
-| `GET /report/{ticker}` | Unified endpoint — everything above in one response. Frontend uses this. |
-| `GET /history/{ticker}` | Past sentiment/price snapshots for the trend chart |
-| `GET /compare?tickers=AAPL,MSFT` | Comparative sentiment/price brief for two tickers |
-| `GET/POST/DELETE /watchlist` | Saved ticker list (no auth — single implicit user) |
+| `GET /news/{ticker}` | Relevance-filtered recent articles |
+| `GET /stock/{ticker}` | Price history + % change |
+| `GET /analyze/{ticker}` | Sentiment + price combined, with `alignment` verdict |
+| `GET /brief/{ticker}` | AI-generated market brief |
+| `GET /report/{ticker}` | Unified endpoint — everything above in one call (used by the frontend) |
+| `GET /history/{ticker}` | Historical sentiment snapshots |
+| `GET /compare?tickers=A,B` | Side-by-side comparison of two tickers |
+| `GET/POST/DELETE /watchlist` | Manage saved tickers |
 | `GET /health` | Health check |
 
-Most endpoints accept an optional `days_back` query param (default 7).
+> All ticker endpoints accept an optional `days_back` parameter.
 
-## Project structure
-marketsynapse/
-├── backend/
-│   ├── main.py                      # FastAPI app entry point
-│   ├── config.py                    # Settings loaded from .env
-│   ├── routers/
-│   │   ├── news.py
-│   │   ├── stock.py
-│   │   ├── correlation.py
-│   │   ├── brief.py
-│   │   ├── report.py                # Unified endpoint — frontend uses this
-│   │   ├── history.py                # Sentiment trend over time
-│   │   ├── compare.py                # Multi-ticker comparison
-│   │   └── watchlist.py              # Saved tickers CRUD
-│   ├── services/
-│   │   ├── news_service.py           # NewsAPI integration + relevance filtering
-│   │   ├── sentiment_service.py      # FinBERT sentiment analysis
-│   │   ├── stock_service.py          # yfinance price data + earnings date
-│   │   ├── correlation_service.py    # Combines sentiment + price
-│   │   ├── agent_service.py          # LangGraph agent -> market brief (3-node, self-reviewing)
-│   │   ├── comparison_service.py     # LangGraph agent -> comparative brief
-│   │   ├── history_service.py        # Sentiment history persistence
-│   │   ├── watchlist_service.py      # Watchlist CRUD
-│   │   └── cache_service.py          # In-memory TTL cache
-│   ├── models/schemas.py
-│   └── database/
-│       ├── db.py                     # SQLAlchemy engine/session
-│       └── models.py                 # SentimentHistory, Watchlist tables
-├── frontend/                          # React + Vite + Tailwind v4
-│   └── src/
-│       ├── App.jsx                    # Single-ticker + Compare mode toggle
-│       ├── hooks/useTheme.js          # Dark/light mode, persisted via localStorage
-│       └── components/                # PricePanel, SignalReadout, CompareView,
-│                                       # SentimentTrendChart, Watchlist, ExportControls, etc.
-├── tests/
-│   ├── test_news_service.py           # _is_relevant(), _build_query()
-│   ├── test_correlation_service.py    # _overall_sentiment(), _determine_alignment()
-│   ├── test_stock_service.py          # fetch_price_summary() math, mocked yfinance
-│   ├── test_review_brief.py           # Manual eval — self-correction node limitations
-│   └── eval_brief.py                  # Scored rubric harness for both brief types
-├── .github/workflows/tests.yml        # CI (not yet pushed/active)
-├── requirements.txt
-└── .env.example
-## What's built
+---
 
-**Core pipeline:** live news sentiment (FinBERT) × price movement (yfinance) × LLM-generated plain-English brief (LangGraph + Groq), unified into one `/report/{ticker}` call.
+## 🧪 Testing
 
-**Historical tracking:** every fresh (non-cached) analysis is persisted to SQLite, powering a sentiment-over-time trend chart per ticker.
+```bash
+pytest tests/ -v
 
-**Multi-ticker comparison:** a second LangGraph agent fetches two tickers in parallel and writes a comparative brief, under the same anti-hallucination constraints as the single-ticker brief.
+# Rubric-scored eval for the LLM brief (costs Groq API calls)
+python tests/eval_brief.py
+```
 
-**Self-correcting brief pipeline:** a third graph node reviews each generated brief against two rules (no hallucinated details, no investment advice) before it's returned. **Measured limitation, documented rather than hidden:** this reliably catches explicit advice language but is less reliable at catching subtler hallucinated entities with the small/fast model used here (`llama-3.1-8b-instant`) — see `tests/test_review_brief.py` for the eval that surfaced this.
+---
 
-**Earnings-awareness:** next earnings date (when available from yfinance) is included in the brief's source facts, and the brief will only ever mention it if it's actually present — never invented.
+## ⚠️ Known Limitations
 
-**Watchlist:** save/remove tickers, click to reload their report.
+- **NewsAPI free tier:** 100 requests/day, articles limited to the past month.
+- **yfinance** is an unofficial Yahoo Finance scraper — occasional transient failures are expected, and NaN price rows (e.g. on days markets are closed) are filtered out before analysis.
+- **FinBERT** can misread routine corporate language (e.g. a neutral dividend announcement) as negative.
+- The self-correction agent node reliably catches explicit investment advice but is less reliable at catching subtler hallucinated details — a documented capability limit of the small, fast model used (`llama-3.1-8b-instant`), not an unfixed bug.
+- The eval harness uses substring/keyword checks, not semantic verification.
+- In-memory cache and recent-search history reset on server/page restart — intentional for this phase, not an oversight.
 
-**Export:** copy the brief to clipboard, or print/save-as-PDF with a dedicated print stylesheet.
+---
 
-**Dark/light theme:** toggle, defaults to system preference, persisted in `localStorage`.
+<div align="center">
 
-**Automated tests:** 27 unit tests over the core decision logic (relevance filtering, sentiment aggregation, alignment rules, price math, error handling), plus a lightweight scored eval harness for both brief types.
+⭐ Found this project useful? Drop a star on GitHub!
 
-## Known limitations
-
-- NewsAPI free tier: 100 requests/day, articles limited to the past month.
-- yfinance is an unofficial Yahoo Finance scraper — occasional transient failures are expected, not bugs. If you see a "possibly delisted" error on a real ticker, it's very likely transient; retry, or check `yfinance` is updated to a recent version (`pip install --upgrade yfinance`).
-- FinBERT can misclassify routine/neutral financial language as negative.
-- The self-correction review node (see above) is measured to reliably catch explicit investment-advice language but is less reliable at catching subtler hallucinated details — a known limitation of using a small/fast LLM for nuanced fact-checking, not a bug to silently patch.
-- The eval harness's rubric checks (e.g. "states correct alignment") use substring matching, not semantic verification — a 100% pass rate reflects the heuristic, not a guarantee of perfect brief accuracy.
-- In-memory correlation cache (5 min TTL) and recent-search history are both non-persistent — reset on server/page restart. This is intentional, not an oversight.
-- No authentication — watchlist and history assume a single implicit user. Fine for local/demo use; would need auth before any multi-user deployment.
-- SQLite is used for persistence; fine until deployment resumes, at which point an ephemeral filesystem (e.g. some Railway configurations) may need a persisted volume or external DB.
-
-## What's left
-
-- Deployment: backend → Railway, frontend → Vercel; lock down CORS to the real frontend domain once both are live.
-- CI workflow exists (`.github/workflows/tests.yml`) but hasn't been pushed/activated yet — runs the full pytest suite on push once enabled.
+</div>

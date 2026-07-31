@@ -39,12 +39,17 @@ export default function CompareView() {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleCompare();
+  };
+
   return (
     <div>
       <div className="flex gap-2 mb-3 flex-wrap">
         <input
           value={tickerA}
           onChange={(e) => setTickerA(e.target.value.toUpperCase())}
+          onKeyDown={handleKeyDown}
           className="font-mono flex-1 min-w-[100px] px-3 py-2.5 rounded-md text-sm tracking-wider outline-none"
           style={{
             background: "var(--bg-surface)",
@@ -60,6 +65,7 @@ export default function CompareView() {
         <input
           value={tickerB}
           onChange={(e) => setTickerB(e.target.value.toUpperCase())}
+          onKeyDown={handleKeyDown}
           className="font-mono flex-1 min-w-[100px] px-3 py-2.5 rounded-md text-sm tracking-wider outline-none"
           style={{
             background: "var(--bg-surface)",
@@ -75,7 +81,7 @@ export default function CompareView() {
           onClick={handleCompare}
           disabled={loading}
           className="font-display px-6 py-2.5 rounded-md text-sm font-semibold tracking-wide transition disabled:opacity-40"
-          style={{ background: "var(--signal-positive)", color: "#04342c" }}
+          style={{ background: "var(--signal-positive)", color: "#141a04" }}
         >
           {loading ? "Comparing…" : "Compare"}
         </button>

@@ -22,6 +22,28 @@ const alignmentMeta = {
   },
 };
 
+function SentimentGauge({ score }) {
+  // score ranges -1 to +1; convert to a 0-100% position
+  const pct = ((score + 1) / 2) * 100;
+  const color = score > 0.15 ? "#22c55e" : score < -0.15 ? "#ef4444" : "var(--border-strong)";
+
+  return (
+    <div className="my-6">
+      <div className="flex justify-between font-mono text-[10px] mb-1.5" style={{ color: "var(--text-tertiary)" }}>
+        <span>-1.0</span>
+        <span>0</span>
+        <span>+1.0</span>
+      </div>
+      <div className="relative h-2 rounded-full" style={{ background: "var(--bg-surface-raised)" }}>
+        <div
+          className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2"
+          style={{ left: `calc(${pct}% - 6px)`, background: color, borderColor: "var(--bg-surface)" }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function SignalReadout({ sentimentLabel, sentimentScore, alignment }) {
   const sMeta = sentimentMeta[sentimentLabel] || sentimentMeta.neutral;
   const aMeta = alignmentMeta[alignment] || alignmentMeta.mixed;
@@ -53,7 +75,7 @@ export default function SignalReadout({ sentimentLabel, sentimentScore, alignmen
           </p>
         </div>
       </div>
-
+      <SentimentGauge score={sentimentScore} />
       <div
         className="mt-auto pt-4 border-t flex items-center justify-between"
         style={{ borderColor: "var(--border-hairline)" }}

@@ -20,9 +20,9 @@ export default function PricePanel({ price, articles }) {
   });
   const total = articles.length || 1;
   const segments = [
-    { key: "positive", pct: (counts.positive / total) * 100, color: "var(--signal-positive)" },
+    { key: "positive", pct: (counts.positive / total) * 100, color: "#22c55e" },
     { key: "neutral", pct: (counts.neutral / total) * 100, color: "var(--border-strong)" },
-    { key: "negative", pct: (counts.negative / total) * 100, color: "var(--signal-negative)" },
+    { key: "negative", pct: (counts.negative / total) * 100, color: "#ef4444" },
   ].filter((s) => s.pct > 0);
 
   return (

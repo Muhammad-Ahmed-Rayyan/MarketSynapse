@@ -110,6 +110,7 @@ function App() {
           </div>
         </header>
 
+      <div className="flex-1">
         <div className="flex items-center justify-between mb-5">
           <div
             className="inline-flex p-1 rounded-full"
@@ -251,6 +252,8 @@ function App() {
             )}
           </>
         )}
+        </div>
+
         <Footer />
       </div>
     </div>

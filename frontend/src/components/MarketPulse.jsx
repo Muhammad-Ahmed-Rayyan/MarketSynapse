@@ -63,7 +63,7 @@ export default function MarketPulse({ onSelect }) {
               </p>
               <p
                 className="font-mono text-xs mt-0.5"
-                style={{ color: isUp ? "var(--signal-positive)" : "var(--signal-negative)" }}
+                style={{ color: isUp ? "#22c55e" : "#ef4444" }}
               >
                 {isUp ? "▲" : "▼"} {Math.abs(s.change_pct)}%
               </p>

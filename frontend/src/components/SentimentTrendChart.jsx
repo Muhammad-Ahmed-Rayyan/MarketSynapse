@@ -67,7 +67,7 @@ export default function SentimentTrendChart({ history }) {
             <Line
               type="monotone"
               dataKey="avg_sentiment_score"
-              stroke="#00d9a3"
+              stroke="var(--signal-positive)"
               strokeWidth={2}
               dot={{ r: 3, fill: "#00d9a3" }}
             />
