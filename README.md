@@ -166,9 +166,6 @@ npm run dev
 ```
 
 > Both servers must run simultaneously. `.env` files are gitignored — each person running this needs their own free API keys.
-
-> **Windows note:** if `npm install` fails with a native-binding error (`rolldown-binding... not a valid Win32 application`), it's a known npm bug (npm/cli#4828) — delete `node_modules/` and `package-lock.json`, run `npm cache clean --force`, then reinstall.
-
 ---
 
 ## 🔑 API Configuration
